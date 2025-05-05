@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dbus/dbus.dart';
 
@@ -54,7 +55,9 @@ class UDisksDrive {
   /// The physical kind of media the drive uses or the type of the drive or blank if unknown.
   List<String> get mediaCompatibility =>
       _object.getStringArrayProperty(
-          _driveInterfaceName, 'MediaCompatibility') ??
+        _driveInterfaceName,
+        'MediaCompatibility',
+      ) ??
       [];
 
   /// Whether the media can be removed from the drive.
@@ -132,22 +135,35 @@ class UDisksDrive {
 
   /// Sets the configuration for the drive.
   Future<void> setConfiguration(Map<String, DBusValue> values) async {
-    await _object.callMethod(_driveInterfaceName, 'SetConfiguration',
-        [DBusDict.stringVariant(values), DBusDict.stringVariant({})],
+    await _object.callMethod(
+        _driveInterfaceName,
+        'SetConfiguration',
+        [
+          DBusDict.stringVariant(values),
+          DBusDict.stringVariant({}),
+        ],
         replySignature: DBusSignature(''));
   }
 
   /// Ejects media from this drive.
   Future<void> eject() async {
     await _object.callMethod(
-        _driveInterfaceName, 'Eject', [DBusDict.stringVariant({})],
+        _driveInterfaceName,
+        'Eject',
+        [
+          DBusDict.stringVariant({}),
+        ],
         replySignature: DBusSignature(''));
   }
 
   /// Arranges for the drive to be safely removed and powered off.
   Future<void> powerOff() async {
     await _object.callMethod(
-        _driveInterfaceName, 'PowerOff', [DBusDict.stringVariant({})],
+        _driveInterfaceName,
+        'PowerOff',
+        [
+          DBusDict.stringVariant({}),
+        ],
         replySignature: DBusSignature(''));
   }
 }
@@ -187,6 +203,7 @@ class UDisksConfigurationItem {
 /// A block device on this system.
 class UDisksBlockDevice {
   final String _blockInterfaceName = 'org.freedesktop.UDisks2.Block';
+  final String _filesystemInterfaceName = 'org.freedesktop.UDisks2.Filesystem';
 
   final UDisksClient _client;
   final _UDisksObject _object;
@@ -214,7 +231,9 @@ class UDisksBlockDevice {
   /// The block device that is backing this encrypted device.
   UDisksBlockDevice? get cryptoBackingDevice {
     var objectPath = _object.getObjectPathProperty(
-        _blockInterfaceName, 'CryptoBackingDevice');
+      _blockInterfaceName,
+      'CryptoBackingDevice',
+    );
     return objectPath != null ? _client._getBlockDevice(objectPath) : null;
   }
 
@@ -228,8 +247,10 @@ class UDisksBlockDevice {
 
   /// The drive this block device belongs to.
   UDisksDrive? get drive {
-    var objectPath =
-        _object.getObjectPathProperty(_blockInterfaceName, 'Drive');
+    var objectPath = _object.getObjectPathProperty(
+      _blockInterfaceName,
+      'Drive',
+    );
     return objectPath != null ? _client._getDrive(objectPath) : null;
   }
 
@@ -326,60 +347,89 @@ class UDisksBlockDevice {
   /// List of userspace mount options..
   List<String> get userspaceMountOptions =>
       _object.getStringArrayProperty(
-          _blockInterfaceName, 'UserspaceMountOptions') ??
+        _blockInterfaceName,
+        'UserspaceMountOptions',
+      ) ??
       [];
 
+  /// Gets the Filesystem interface for this block device, if available.
+  UDisksFileSystem? get filesystem {
+    if (_object.interfaces.containsKey(_filesystemInterfaceName)) {
+      return UDisksFileSystem(_object);
+    }
+    return null;
+  }
+
   DBusStruct _encodeConfigurationItem(UDisksConfigurationItem item) {
-    return DBusStruct(
-        [DBusString(item.type), DBusDict.stringVariant(item.details)]);
+    return DBusStruct([
+      DBusString(item.type),
+      DBusDict.stringVariant(item.details),
+    ]);
   }
 
   UDisksConfigurationItem _parseConfigurationItem(DBusStruct value) {
     Map<String, DBusValue> parseConfigurationDetails(DBusDict value) =>
-        value.children.map((key, value) =>
-            MapEntry((key as DBusString).value, (value as DBusVariant).value));
+        value.children.map(
+          (key, value) =>
+              MapEntry((key as DBusString).value, (value as DBusVariant).value),
+        );
     return UDisksConfigurationItem(
-        (value.children.elementAt(0) as DBusString).value,
-        parseConfigurationDetails(value.children.elementAt(1) as DBusDict));
+      (value.children.elementAt(0) as DBusString).value,
+      parseConfigurationDetails(value.children.elementAt(1) as DBusDict),
+    );
   }
 
   /// Adds a new configuration item.
   Future<void> addConfigurationItem(UDisksConfigurationItem item) async {
     var options = <String, DBusValue>{};
-    await _object.callMethod(_blockInterfaceName, 'AddConfigurationItem',
-        [_encodeConfigurationItem(item), DBusDict.stringVariant(options)],
+    await _object.callMethod(
+        _blockInterfaceName,
+        'AddConfigurationItem',
+        [
+          _encodeConfigurationItem(item),
+          DBusDict.stringVariant(options),
+        ],
         replySignature: DBusSignature(''));
   }
 
   /// Removes an existing configuration item.
   Future<void> removeConfigurationItem(UDisksConfigurationItem item) async {
     var options = <String, DBusValue>{};
-    await _object.callMethod(_blockInterfaceName, 'RemoveConfigurationItem',
-        [_encodeConfigurationItem(item), DBusDict.stringVariant(options)],
-        replySignature: DBusSignature(''));
+    await _object.callMethod(
+      _blockInterfaceName,
+      'RemoveConfigurationItem',
+      [_encodeConfigurationItem(item), DBusDict.stringVariant(options)],
+      replySignature: DBusSignature(''),
+    );
   }
 
   /// Removes a configuration item and adds a new one.
   Future<void> updateConfigurationItem(
-      UDisksConfigurationItem oldItem, UDisksConfigurationItem newItem) async {
+    UDisksConfigurationItem oldItem,
+    UDisksConfigurationItem newItem,
+  ) async {
     var options = <String, DBusValue>{};
     await _object.callMethod(
-        _blockInterfaceName,
-        'UpdateConfigurationItem',
-        [
-          _encodeConfigurationItem(oldItem),
-          _encodeConfigurationItem(newItem),
-          DBusDict.stringVariant(options)
-        ],
-        replySignature: DBusSignature(''));
+      _blockInterfaceName,
+      'UpdateConfigurationItem',
+      [
+        _encodeConfigurationItem(oldItem),
+        _encodeConfigurationItem(newItem),
+        DBusDict.stringVariant(options),
+      ],
+      replySignature: DBusSignature(''),
+    );
   }
 
   /// Returns the same value as in the [configuration] property but without secret information filtered out.
   Future<List<UDisksConfigurationItem>> getSecretConfiguration() async {
     var options = <String, DBusValue>{};
-    var result = await _object.callMethod(_blockInterfaceName,
-        'GetSecretConfiguration', [DBusDict.stringVariant(options)],
-        replySignature: DBusSignature('a(sa{sv})'));
+    var result = await _object.callMethod(
+      _blockInterfaceName,
+      'GetSecretConfiguration',
+      [DBusDict.stringVariant(options)],
+      replySignature: DBusSignature('a(sa{sv})'),
+    );
     return (result.returnValues[0] as DBusArray)
         .children
         .map((item) => _parseConfigurationItem(item as DBusStruct))
@@ -387,16 +437,18 @@ class UDisksBlockDevice {
   }
 
   /// Formats the device with a file system, partition table or other well-known content.
-  Future<void> format(String type,
-      {bool takeOwnership = false,
-      dynamic encryptPassphrase,
-      UDisksFormatEraseMethod? erase,
-      bool updatePartitionType = false,
-      bool noBlock = false,
-      bool dryRunFirst = false,
-      bool noDiscard = false,
-      Iterable<UDisksConfigurationItem> configItems = const [],
-      bool tearDown = false}) async {
+  Future<void> format(
+    String type, {
+    bool takeOwnership = false,
+    dynamic encryptPassphrase,
+    UDisksFormatEraseMethod? erase,
+    bool updatePartitionType = false,
+    bool noBlock = false,
+    bool dryRunFirst = false,
+    bool noDiscard = false,
+    Iterable<UDisksConfigurationItem> configItems = const [],
+    bool tearDown = false,
+  }) async {
     var options = <String, DBusValue>{};
     if (takeOwnership) {
       options['take-ownership'] = DBusBoolean(true);
@@ -438,14 +490,21 @@ class UDisksBlockDevice {
       options['no-discard'] = DBusBoolean(true);
     }
     if (configItems.isNotEmpty) {
-      options['config-items'] = DBusArray(DBusSignature('(sa{sv})'),
-          configItems.map((item) => _encodeConfigurationItem(item)));
+      options['config-items'] = DBusArray(
+        DBusSignature('(sa{sv})'),
+        configItems.map((item) => _encodeConfigurationItem(item)),
+      );
     }
     if (tearDown) {
       options['tear-down'] = DBusBoolean(true);
     }
-    await _object.callMethod(_blockInterfaceName, 'Format',
-        [DBusString(type), DBusDict.stringVariant(options)],
+    await _object.callMethod(
+        _blockInterfaceName,
+        'Format',
+        [
+          DBusString(type),
+          DBusDict.stringVariant(options),
+        ],
         replySignature: DBusSignature(''));
   }
 
@@ -453,7 +512,169 @@ class UDisksBlockDevice {
   Future<void> rescan() async {
     var options = <String, DBusValue>{};
     await _object.callMethod(
-        _blockInterfaceName, 'Rescan', [DBusDict.stringVariant(options)],
+        _blockInterfaceName,
+        'Rescan',
+        [
+          DBusDict.stringVariant(options),
+        ],
+        replySignature: DBusSignature(''));
+  }
+}
+
+/// Represents the org.freedesktop.UDisks2.Filesystem interface.
+class UDisksFileSystem {
+  final String _filesystemInterfaceName = 'org.freedesktop.UDisks2.Filesystem';
+  final _UDisksObject _object;
+
+  UDisksFileSystem(this._object);
+
+  /// An array of filesystem paths where the file system on the device is mounted.
+  /// If the device is not mounted, this array is empty.
+  List<String> get mountPoints {
+    var value = _object.getCachedProperty(
+      _filesystemInterfaceName,
+      'MountPoints',
+    );
+    if (value == null || value.signature != DBusSignature('aay')) {
+      return [];
+    }
+    return (value as DBusArray)
+        .children
+        .map(
+          (e) => utf8.decode(
+            (e as DBusArray)
+                .children
+                .map((b) => (b as DBusByte).value)
+                .toList(),
+          ),
+        )
+        .toList();
+  }
+
+  /// The size of the filesystem in bytes.
+  /// Returns 0 if the size is unknown.
+  /// Note: Reading this property typically causes I/O.
+  int get size =>
+      _object.getUint64Property(_filesystemInterfaceName, 'Size') ?? 0;
+
+  /// Sets the filesystem label.
+  Future<void> setLabel(String label) async {
+    await _object.callMethod(
+        _filesystemInterfaceName,
+        'SetLabel',
+        [
+          DBusString(label),
+          DBusDict.stringVariant({}),
+        ],
+        replySignature: DBusSignature(''));
+  }
+
+  /// Sets the filesystem UUID value. (Requires UDisks >= 2.10.0)
+  Future<void> setUUID(String uuid) async {
+    await _object.callMethod(
+        _filesystemInterfaceName,
+        'SetUUID',
+        [
+          DBusString(uuid),
+          DBusDict.stringVariant({}),
+        ],
+        replySignature: DBusSignature(''));
+  }
+
+  /// Mounts the filesystem.
+  ///
+  /// Returns the path where the filesystem was mounted.
+  ///
+  /// Options:
+  /// - `fstype` (String): Override filesystem type.
+  /// - `options` (String): Comma-separated mount options.
+  /// - `as-user` (String): Mount on behalf of a specific user (username).
+  Future<String> mount({Map<String, DBusValue> options = const {}}) async {
+    var result = await _object.callMethod(
+        _filesystemInterfaceName,
+        'Mount',
+        [
+          DBusDict.stringVariant(options),
+        ],
+        replySignature: DBusSignature('s'));
+    return (result.returnValues[0] as DBusString).value;
+  }
+
+  /// Unmounts the filesystem.
+  ///
+  /// Options:
+  /// - `force` (bool): Force unmount even if busy.
+  Future<void> unmount({bool force = false}) async {
+    var options = <String, DBusValue>{};
+    if (force) {
+      options['force'] = DBusBoolean(true);
+    }
+    await _object.callMethod(
+        _filesystemInterfaceName,
+        'Unmount',
+        [
+          DBusDict.stringVariant(options),
+        ],
+        replySignature: DBusSignature(''));
+  }
+
+  /// Resizes the filesystem. (Requires UDisks >= 2.7.2)
+  ///
+  /// Set [size] to 0 for maximum size.
+  Future<void> resize(int size) async {
+    await _object.callMethod(
+        _filesystemInterfaceName,
+        'Resize',
+        [
+          DBusUint64(size),
+          DBusDict.stringVariant({}),
+        ],
+        replySignature: DBusSignature(''));
+  }
+
+  /// Checks the filesystem for consistency without modifying it. (Requires UDisks >= 2.7.2)
+  ///
+  /// Returns true if the filesystem is consistent.
+  Future<bool> check() async {
+    var result = await _object.callMethod(
+        _filesystemInterfaceName,
+        'Check',
+        [
+          DBusDict.stringVariant({}),
+        ],
+        replySignature: DBusSignature('b'));
+    return (result.returnValues[0] as DBusBoolean).value;
+  }
+
+  /// Tries to repair the filesystem. (Requires UDisks >= 2.7.2)
+  ///
+  /// Returns true if the filesystem was successfully repaired.
+  Future<bool> repair() async {
+    var result = await _object.callMethod(
+        _filesystemInterfaceName,
+        'Repair',
+        [
+          DBusDict.stringVariant({}),
+        ],
+        replySignature: DBusSignature('b'));
+    return (result.returnValues[0] as DBusBoolean).value;
+  }
+
+  /// Changes ownership of the filesystem to the UID and GID of the calling user. (Requires UDisks >= 2.7.2)
+  ///
+  /// Options:
+  /// - `recursive` (bool): Apply ownership recursively.
+  Future<void> takeOwnership({bool recursive = false}) async {
+    var options = <String, DBusValue>{};
+    if (recursive) {
+      options['recursive'] = DBusBoolean(true);
+    }
+    await _object.callMethod(
+        _filesystemInterfaceName,
+        'TakeOwnership',
+        [
+          DBusDict.stringVariant(options),
+        ],
         replySignature: DBusSignature(''));
   }
 }
@@ -465,19 +686,25 @@ class _UDisksManager {
   /// Encryption types supported.
   List<String> get supportedEncryptionTypes =>
       object.getStringArrayProperty(
-          _managerInterfaceName, 'SupportedEncryptionTypes') ??
+        _managerInterfaceName,
+        'SupportedEncryptionTypes',
+      ) ??
       [];
 
   /// Default encryption type to use.
   String get defaultEncryptionType =>
       object.getStringProperty(
-          _managerInterfaceName, 'DefaultEncryptionType') ??
+        _managerInterfaceName,
+        'DefaultEncryptionType',
+      ) ??
       '';
 
   /// Filesystems supported by UDisks.
   List<String> get supportedFilesystems =>
       object.getStringArrayProperty(
-          _managerInterfaceName, 'SupportedFilesystems') ??
+        _managerInterfaceName,
+        'SupportedFilesystems',
+      ) ??
       [];
 
   /// The version of the daemon.
@@ -507,7 +734,8 @@ class _UDisksObject extends DBusRemoteObject {
   final interfaces = <String, _UDisksInterface>{};
 
   void updateInterfaces(
-      Map<String, Map<String, DBusValue>> interfacesAndProperties) {
+    Map<String, Map<String, DBusValue>> interfacesAndProperties,
+  ) {
     interfacesAndProperties.forEach((interfaceName, properties) {
       interfaces[interfaceName] = _UDisksInterface(properties);
     });
@@ -530,7 +758,9 @@ class _UDisksObject extends DBusRemoteObject {
   }
 
   void updateProperties(
-      String interfaceName, Map<String, DBusValue> changedProperties) {
+    String interfaceName,
+    Map<String, DBusValue> changedProperties,
+  ) {
     var interface = interfaces[interfaceName];
     if (interface != null) {
       interface.updateProperties(changedProperties);
@@ -650,7 +880,9 @@ class _UDisksObject extends DBusRemoteObject {
 
   /// Gets a list of key value pairs, or returns null if not present or not the correct type.
   Map<String, DBusValue>? getConfigurationProperty(
-      String interface, String name) {
+    String interface,
+    String name,
+  ) {
     var value = getCachedProperty(interface, name);
     if (value == null) {
       return null;
@@ -658,13 +890,17 @@ class _UDisksObject extends DBusRemoteObject {
     if (value.signature != DBusSignature('a{sv}')) {
       return null;
     }
-    return (value as DBusDict).children.map((key, value) =>
-        MapEntry((key as DBusString).value, (value as DBusVariant).value));
+    return (value as DBusDict).children.map(
+          (key, value) =>
+              MapEntry((key as DBusString).value, (value as DBusVariant).value),
+        );
   }
 
-  _UDisksObject(DBusClient client, DBusObjectPath path,
-      Map<String, Map<String, DBusValue>> interfacesAndProperties)
-      : super(client, name: 'org.freedesktop.UDisks2', path: path) {
+  _UDisksObject(
+    DBusClient client,
+    DBusObjectPath path,
+    Map<String, Map<String, DBusValue>> interfacesAndProperties,
+  ) : super(client, name: 'org.freedesktop.UDisks2', path: path) {
     updateInterfaces(interfacesAndProperties);
   }
 }
@@ -726,9 +962,11 @@ class UDisksClient {
   UDisksClient({DBusClient? bus})
       : _bus = bus ?? DBusClient.system(),
         _closeBus = bus == null {
-    _root = DBusRemoteObjectManager(_bus,
-        name: 'org.freedesktop.UDisks2',
-        path: DBusObjectPath('/org/freedesktop/UDisks2'));
+    _root = DBusRemoteObjectManager(
+      _bus,
+      name: 'org.freedesktop.UDisks2',
+      path: DBusObjectPath('/org/freedesktop/UDisks2'),
+    );
   }
 
   /// Connects to the UDisks D-Bus objects.
@@ -747,13 +985,17 @@ class UDisksClient {
           object.updateInterfaces(signal.interfacesAndProperties);
         } else {
           object = _UDisksObject(
-              _bus, signal.changedPath, signal.interfacesAndProperties);
+            _bus,
+            signal.changedPath,
+            signal.interfacesAndProperties,
+          );
           _objects[signal.changedPath] = object;
           if (_isDrive(object)) {
             _driveAddedStreamController.add(UDisksDrive(object));
           } else if (_isBlockDevice(object)) {
-            _blockDeviceAddedStreamController
-                .add(UDisksBlockDevice(this, object));
+            _blockDeviceAddedStreamController.add(
+              UDisksBlockDevice(this, object),
+            );
           }
         }
       } else if (signal is DBusObjectManagerInterfacesRemovedSignal) {
@@ -769,17 +1011,21 @@ class UDisksClient {
 
           if (signal.interfaces.contains('org.freedesktop.UDisks2.Drive')) {
             _driveRemovedStreamController.add(UDisksDrive(object));
-          } else if (signal.interfaces
-              .contains('org.freedesktop.UDisks2.Block')) {
-            _blockDeviceRemovedStreamController
-                .add(UDisksBlockDevice(this, object));
+          } else if (signal.interfaces.contains(
+            'org.freedesktop.UDisks2.Block',
+          )) {
+            _blockDeviceRemovedStreamController.add(
+              UDisksBlockDevice(this, object),
+            );
           }
         }
       } else if (signal is DBusPropertiesChangedSignal) {
         var object = _objects[signal.path];
         if (object != null) {
           object.updateProperties(
-              signal.propertiesInterface, signal.changedProperties);
+            signal.propertiesInterface,
+            signal.changedProperties,
+          );
         }
       }
     });
@@ -787,8 +1033,11 @@ class UDisksClient {
     // Find all the objects exported.
     var objects = await _root.getManagedObjects();
     objects.forEach((objectPath, interfacesAndProperties) {
-      _objects[objectPath] =
-          _UDisksObject(_bus, objectPath, interfacesAndProperties);
+      _objects[objectPath] = _UDisksObject(
+        _bus,
+        objectPath,
+        interfacesAndProperties,
+      );
     });
 
     var managerObject =
