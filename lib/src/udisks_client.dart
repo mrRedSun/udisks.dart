@@ -166,6 +166,41 @@ class UDisksDrive {
         ],
         replySignature: DBusSignature(''));
   }
+
+  @override
+  String toString() {
+    return '''UDisksDrive(
+      canPowerOff: $canPowerOff,
+      configuration: $configuration,
+      connectionBus: $connectionBus,
+      ejectable: $ejectable,
+      id: $id,
+      media: $media,
+      mediaAvailable: $mediaAvailable,
+      mediaChangeDetected: $mediaChangeDetected,
+      mediaCompatibility: $mediaCompatibility,
+      mediaRemovable: $mediaRemovable,
+      model: $model,
+      optical: $optical,
+      opticalBlank: $opticalBlank,
+      opticalNumTracks: $opticalNumTracks,
+      opticalNumAudioTracks: $opticalNumAudioTracks,
+      opticalNumDataTracks: $opticalNumDataTracks,
+      opticalNumSessions: $opticalNumSessions,
+      removable: $removable,
+      revision: $revision,
+      rotationRate: $rotationRate,
+      seat: $seat,
+      serial: $serial,
+      siblingId: $siblingId,
+      size: $size,
+      sortKey: $sortKey,
+      timeDetected: $timeDetected,
+      timeMediaDetected: $timeMediaDetected,
+      vendor: $vendor,
+      wwn: $wwn
+    )''';
+  }
 }
 
 /// Block device configuration.
@@ -519,6 +554,36 @@ class UDisksBlockDevice {
         ],
         replySignature: DBusSignature(''));
   }
+
+  @override
+  String toString() {
+    return '''UDisksBlockDevice(
+      configuration: $configuration,
+      cryptoBackingDevice: $cryptoBackingDevice,
+      device: $device,
+      deviceNumber: $deviceNumber,
+      drive: $drive,
+      hintAuto: $hintAuto,
+      hintIconName: $hintIconName,
+      hintIgnore: $hintIgnore,
+      hintName: $hintName,
+      hintPartitionable: $hintPartitionable,
+      hintSymbolicIconName: $hintSymbolicIconName,
+      hintSystem: $hintSystem,
+      id: $id,
+      idLabel: $idLabel,
+      idType: $idType,
+      idUsage: $idUsage,
+      idUUID: $idUUID,
+      idVersion: $idVersion,
+      preferredDevice: $preferredDevice,
+      readOnly: $readOnly,
+      size: $size,
+      symlinks: $symlinks,
+      userspaceMountOptions: $userspaceMountOptions,
+      filesystem: $filesystem
+    )''';
+  }
 }
 
 /// Represents the org.freedesktop.UDisks2.Filesystem interface.
@@ -677,6 +742,14 @@ class UDisksFileSystem {
         ],
         replySignature: DBusSignature(''));
   }
+
+  @override
+  String toString() {
+    return '''UDisksFileSystem(
+      mountPoints: $mountPoints,
+      size: $size
+    )''';
+  }
 }
 
 class _UDisksManager {
@@ -712,6 +785,16 @@ class _UDisksManager {
       object.getStringProperty(_managerInterfaceName, 'Version') ?? '';
 
   _UDisksManager(this.object);
+
+  @override
+  String toString() {
+    return '''UDisksManager(
+      supportedEncryptionTypes: $supportedEncryptionTypes,
+      defaultEncryptionType: $defaultEncryptionType,
+      supportedFilesystems: $supportedFilesystems,
+      version: $version
+    )''';
+  }
 }
 
 class _UDisksInterface {
@@ -1096,5 +1179,15 @@ class UDisksClient {
     if (_closeBus) {
       await _bus.close();
     }
+  }
+
+  @override
+  String toString() {
+    return '''UDisksClient(
+      supportedEncryptionTypes: $supportedEncryptionTypes,
+      supportedFilesystems: $supportedFilesystems,
+      defaultEncryptionType: $defaultEncryptionType,
+      version: $version
+    )''';
   }
 }
