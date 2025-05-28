@@ -7,15 +7,13 @@ import 'package:udisks/udisks.dart';
 
 class MockUDisksManager extends DBusObject {
   final MockUDisksServer server;
-  MockUDisksManager(this.server)
-      : super(DBusObjectPath('/org/freedesktop/UDisks2/Manager'));
+  MockUDisksManager(this.server) : super(DBusObjectPath('/org/freedesktop/UDisks2/Manager'));
 
   @override
   Map<String, Map<String, DBusValue>> get interfacesAndProperties => {
         'org.freedesktop.UDisks2.Manager': {
           'DefaultEncryptionType': DBusString(server.defaultEncryptionType),
-          'SupportedEncryptionTypes':
-              DBusArray.string(server.supportedEncryptionTypes),
+          'SupportedEncryptionTypes': DBusArray.string(server.supportedEncryptionTypes),
           'SupportedFilesystems': DBusArray.string(server.supportedFilesystems),
           'Version': DBusString(server.version)
         }
@@ -133,9 +131,9 @@ class MockUDisksDrive extends DBusObject {
         ejected = true;
         return DBusMethodSuccessResponse([]);
       case 'SetConfiguration':
-        configuration = (methodCall.values[0] as DBusDict).children.map((key,
-                value) =>
-            MapEntry((key as DBusString).value, (value as DBusVariant).value));
+        configuration = (methodCall.values[0] as DBusDict)
+            .children
+            .map((key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value));
         return DBusMethodSuccessResponse([]);
       case 'PowerOff':
         poweredOff = true;
@@ -222,8 +220,7 @@ class MockUDisksBlockDevice extends DBusObject {
               configuration
                   .where((item) => !item.type.startsWith('secret-'))
                   .map((item) => _encodeConfigurationItem(item))),
-          'CryptoBackingDevice':
-              cryptoBackingDevice?.path ?? DBusObjectPath('/'),
+          'CryptoBackingDevice': cryptoBackingDevice?.path ?? DBusObjectPath('/'),
           'Device': DBusArray.byte(device),
           'DeviceNumber': DBusUint64(deviceNumber),
           'Drive': drive?.path ?? DBusObjectPath('/'),
@@ -245,8 +242,7 @@ class MockUDisksBlockDevice extends DBusObject {
           'PreferredDevice': DBusArray.byte(preferredDevice),
           'ReadOnly': DBusBoolean(readOnly),
           'Size': DBusUint64(size),
-          'Symlinks': DBusArray(DBusSignature('ay'),
-              symlinks.map((link) => DBusArray.byte(link))),
+          'Symlinks': DBusArray(DBusSignature('ay'), symlinks.map((link) => DBusArray.byte(link))),
           'UserspaceMountOptions': DBusArray.string(userspaceMountOptions)
         }
       };
@@ -259,65 +255,58 @@ class MockUDisksBlockDevice extends DBusObject {
     switch (methodCall.name) {
       case 'AddConfigurationItem':
         var item = _parseConfigurationItem(methodCall.values[0] as DBusStruct);
-        var options = (methodCall.values[1] as DBusDict).children.map((key,
-                value) =>
-            MapEntry((key as DBusString).value, (value as DBusVariant).value));
+        var options = (methodCall.values[1] as DBusDict)
+            .children
+            .map((key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value));
         expect(options, equals({}));
         configuration.add(item);
         return DBusMethodSuccessResponse([]);
       case 'RemoveConfigurationItem':
         var item = _parseConfigurationItem(methodCall.values[0] as DBusStruct);
-        var options = (methodCall.values[1] as DBusDict).children.map((key,
-                value) =>
-            MapEntry((key as DBusString).value, (value as DBusVariant).value));
+        var options = (methodCall.values[1] as DBusDict)
+            .children
+            .map((key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value));
         expect(options, equals({}));
         configuration.remove(item);
         return DBusMethodSuccessResponse([]);
       case 'UpdateConfigurationItem':
-        var oldItem =
-            _parseConfigurationItem(methodCall.values[0] as DBusStruct);
-        var newItem =
-            _parseConfigurationItem(methodCall.values[1] as DBusStruct);
-        var options = (methodCall.values[2] as DBusDict).children.map((key,
-                value) =>
-            MapEntry((key as DBusString).value, (value as DBusVariant).value));
+        var oldItem = _parseConfigurationItem(methodCall.values[0] as DBusStruct);
+        var newItem = _parseConfigurationItem(methodCall.values[1] as DBusStruct);
+        var options = (methodCall.values[2] as DBusDict)
+            .children
+            .map((key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value));
         expect(options, equals({}));
         configuration.remove(oldItem);
         configuration.add(newItem);
         return DBusMethodSuccessResponse([]);
       case 'GetSecretConfiguration':
-        var options = (methodCall.values[0] as DBusDict).children.map((key,
-                value) =>
-            MapEntry((key as DBusString).value, (value as DBusVariant).value));
+        var options = (methodCall.values[0] as DBusDict)
+            .children
+            .map((key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value));
         expect(options, equals({}));
-        return DBusMethodSuccessResponse([
-          DBusArray(DBusSignature('(sa{sv})'),
-              configuration.map((item) => _encodeConfigurationItem(item)))
-        ]);
+        return DBusMethodSuccessResponse(
+            [DBusArray(DBusSignature('(sa{sv})'), configuration.map((item) => _encodeConfigurationItem(item)))]);
       case 'Format':
         formatType = (methodCall.values[0] as DBusString).value;
-        var options = (methodCall.values[1] as DBusDict).children.map((key,
-                value) =>
-            MapEntry((key as DBusString).value, (value as DBusVariant).value));
+        var options = (methodCall.values[1] as DBusDict)
+            .children
+            .map((key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value));
         if (options.containsKey('take-ownership')) {
-          formatTakeOwnership =
-              (options['take-ownership'] as DBusBoolean).value;
+          formatTakeOwnership = (options['take-ownership'] as DBusBoolean).value;
         }
         if (options.containsKey('encrypt.passphrase')) {
           var value = options['encrypt.passphrase'];
           if (value is DBusString) {
             formatEncryptPassphrase = value.value;
           } else {
-            formatEncryptPassphrase =
-                (value as DBusArray).children.map((v) => (v as DBusByte).value);
+            formatEncryptPassphrase = (value as DBusArray).children.map((v) => (v as DBusByte).value);
           }
         }
         if (options.containsKey('erase')) {
           formatErase = (options['erase'] as DBusString).value;
         }
         if (options.containsKey('update-partition-type')) {
-          formatUpdatePartitionType =
-              (options['update-partition-type'] as DBusBoolean).value;
+          formatUpdatePartitionType = (options['update-partition-type'] as DBusBoolean).value;
         }
         if (options.containsKey('no-block')) {
           formatNoBlock = (options['no-block'] as DBusBoolean).value;
@@ -348,23 +337,18 @@ class MockUDisksBlockDevice extends DBusObject {
 
   UDisksConfigurationItem _parseConfigurationItem(DBusStruct value) {
     Map<String, DBusValue> parseConfigurationDetails(DBusDict value) =>
-        value.children.map((key, value) =>
-            MapEntry((key as DBusString).value, (value as DBusVariant).value));
-    return UDisksConfigurationItem(
-        (value.children.elementAt(0) as DBusString).value,
+        value.children.map((key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value));
+    return UDisksConfigurationItem((value.children.elementAt(0) as DBusString).value,
         parseConfigurationDetails(value.children.elementAt(1) as DBusDict));
   }
 
   DBusStruct _encodeConfigurationItem(UDisksConfigurationItem item) {
-    return DBusStruct(
-        [DBusString(item.type), DBusDict.stringVariant(item.details)]);
+    return DBusStruct([DBusString(item.type), DBusDict.stringVariant(item.details)]);
   }
 }
 
 class MockUDisksServer extends DBusClient {
-  final DBusObject _root = DBusObject(
-      DBusObjectPath('/org/freedesktop/UDisks2'),
-      isObjectManager: true);
+  final DBusObject _root = DBusObject(DBusObjectPath('/org/freedesktop/UDisks2'), isObjectManager: true);
   late final MockUDisksManager _manager;
 
   final String defaultEncryptionType;
@@ -514,8 +498,7 @@ void main() {
   test('daemon version', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress, version: '1.2.3');
     addTearDown(() async => await udisks.close());
@@ -531,12 +514,10 @@ void main() {
   test('encryption types', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
-    var udisks = MockUDisksServer(clientAddress,
-        supportedEncryptionTypes: ['luks1', 'luks2'],
-        defaultEncryptionType: 'luks1');
+    var udisks =
+        MockUDisksServer(clientAddress, supportedEncryptionTypes: ['luks1', 'luks2'], defaultEncryptionType: 'luks1');
     addTearDown(() async => await udisks.close());
     await udisks.start();
 
@@ -551,18 +532,10 @@ void main() {
   test('filesystems', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
-    var udisks = MockUDisksServer(clientAddress, supportedFilesystems: [
-      'ext2',
-      'ext3',
-      'ext4',
-      'vfat',
-      'exfat',
-      'brtfs',
-      'swap'
-    ]);
+    var udisks = MockUDisksServer(clientAddress,
+        supportedFilesystems: ['ext2', 'ext3', 'ext4', 'vfat', 'exfat', 'brtfs', 'swap']);
     addTearDown(() async => await udisks.close());
     await udisks.start();
 
@@ -570,15 +543,13 @@ void main() {
     addTearDown(() async => await client.close());
     await client.connect();
 
-    expect(client.supportedFilesystems,
-        equals(['ext2', 'ext3', 'ext4', 'vfat', 'exfat', 'brtfs', 'swap']));
+    expect(client.supportedFilesystems, equals(['ext2', 'ext3', 'ext4', 'vfat', 'exfat', 'brtfs', 'swap']));
   });
 
   test('no drives', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -594,8 +565,7 @@ void main() {
   test('drives', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -617,8 +587,7 @@ void main() {
   test('drive added', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -638,8 +607,7 @@ void main() {
   test('drive removed', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -660,8 +628,7 @@ void main() {
   test('drive properties', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -703,8 +670,7 @@ void main() {
     expect(client.drives, hasLength(1));
     var drive = client.drives[0];
     expect(drive.canPowerOff, isTrue);
-    expect(drive.configuration,
-        equals({'key1': DBusString('value1'), 'key2': DBusUint32(2)}));
+    expect(drive.configuration, equals({'key1': DBusString('value1'), 'key2': DBusUint32(2)}));
     expect(drive.connectionBus, equals('CONNECTION-BUS'));
     expect(drive.ejectable, isTrue);
     expect(drive.id, equals('drive'));
@@ -737,8 +703,7 @@ void main() {
   test('configure drive', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -752,17 +717,14 @@ void main() {
     expect(d.configuration, isEmpty);
     expect(client.drives, hasLength(1));
     var drive = client.drives[0];
-    await drive.setConfiguration(
-        {'key1': DBusString('value1'), 'key2': DBusUint32(2)});
-    expect(d.configuration,
-        equals({'key1': DBusString('value1'), 'key2': DBusUint32(2)}));
+    await drive.setConfiguration({'key1': DBusString('value1'), 'key2': DBusUint32(2)});
+    expect(d.configuration, equals({'key1': DBusString('value1'), 'key2': DBusUint32(2)}));
   });
 
   test('eject drive', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -783,8 +745,7 @@ void main() {
   test('power off drive', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -805,8 +766,7 @@ void main() {
   test('no block devices', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -822,8 +782,7 @@ void main() {
   test('block devices', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -845,8 +804,7 @@ void main() {
   test('block device added', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -866,8 +824,7 @@ void main() {
   test('block device removed', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -888,19 +845,16 @@ void main() {
   test('block device properties', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
     await udisks.start();
     var d = await udisks.addDrive('parent_drive');
-    var cryptoDevice = await udisks.addBlockDevice('crypto_device',
-        id: 'parent-crypto-device');
+    var cryptoDevice = await udisks.addBlockDevice('crypto_device', id: 'parent-crypto-device');
     await udisks.addBlockDevice('device',
         configuration: [
-          UDisksConfigurationItem(
-              'type1', {'key1': DBusString('value1'), 'key2': DBusUint32(42)}),
+          UDisksConfigurationItem('type1', {'key1': DBusString('value1'), 'key2': DBusUint32(42)}),
           UDisksConfigurationItem('type2', {})
         ],
         cryptoBackingDevice: cryptoDevice,
@@ -935,8 +889,7 @@ void main() {
     expect(
         blockDevice.configuration,
         equals([
-          UDisksConfigurationItem(
-              'type1', {'key1': DBusString('value1'), 'key2': DBusUint32(42)}),
+          UDisksConfigurationItem('type1', {'key1': DBusString('value1'), 'key2': DBusUint32(42)}),
           UDisksConfigurationItem('type2', {})
         ]));
     expect(blockDevice.cryptoBackingDevice, isNotNull);
@@ -958,20 +911,17 @@ void main() {
     expect(blockDevice.hintPartitionable, equals(true));
     expect(blockDevice.hintSymbolicIconName, equals('HINT-SYMBOLIC-ICON-NAME'));
     expect(blockDevice.hintSystem, equals(true));
-    expect(blockDevice.preferredDevice,
-        equals(utf8.encode('/dev/preferred-device')));
+    expect(blockDevice.preferredDevice, equals(utf8.encode('/dev/preferred-device')));
     expect(blockDevice.readOnly, equals(true));
     expect(blockDevice.size, equals(256000000000));
-    expect(blockDevice.symlinks,
-        equals([utf8.encode('/dev/link1'), utf8.encode('/dev/link2')]));
+    expect(blockDevice.symlinks, equals([utf8.encode('/dev/link1'), utf8.encode('/dev/link2')]));
     expect(blockDevice.userspaceMountOptions, equals(['option1', 'option2']));
   });
 
   test('block device add configuration item', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -986,8 +936,7 @@ void main() {
 
     expect(client.blockDevices, hasLength(1));
     var blockDevice = client.blockDevices[0];
-    await blockDevice.addConfigurationItem(
-        UDisksConfigurationItem('type2', {'key': DBusUint32(42)}));
+    await blockDevice.addConfigurationItem(UDisksConfigurationItem('type2', {'key': DBusUint32(42)}));
     expect(
         d.configuration,
         equals([
@@ -999,8 +948,7 @@ void main() {
   test('block device remove configuration item', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -1016,8 +964,7 @@ void main() {
 
     expect(client.blockDevices, hasLength(1));
     var blockDevice = client.blockDevices[0];
-    await blockDevice.removeConfigurationItem(
-        UDisksConfigurationItem('type2', {'key': DBusUint32(42)}));
+    await blockDevice.removeConfigurationItem(UDisksConfigurationItem('type2', {'key': DBusUint32(42)}));
     expect(
         d.configuration,
         equals([
@@ -1028,8 +975,7 @@ void main() {
   test('block device update configuration item', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -1045,8 +991,7 @@ void main() {
 
     expect(client.blockDevices, hasLength(1));
     var blockDevice = client.blockDevices[0];
-    await blockDevice.updateConfigurationItem(
-        UDisksConfigurationItem('type2', {'key': DBusUint32(42)}),
+    await blockDevice.updateConfigurationItem(UDisksConfigurationItem('type2', {'key': DBusUint32(42)}),
         UDisksConfigurationItem('type2', {'key': DBusDouble(3.14159)}));
     expect(
         d.configuration,
@@ -1059,8 +1004,7 @@ void main() {
   test('block device get secret configuration', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -1092,8 +1036,7 @@ void main() {
   test('block device format', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -1116,8 +1059,7 @@ void main() {
         dryRunFirst: true,
         noDiscard: true,
         configItems: [
-          UDisksConfigurationItem(
-              'type1', {'key1': DBusString('value1'), 'key2': DBusUint32(42)}),
+          UDisksConfigurationItem('type1', {'key1': DBusString('value1'), 'key2': DBusUint32(42)}),
           UDisksConfigurationItem('type2', {})
         ],
         tearDown: true);
@@ -1132,8 +1074,7 @@ void main() {
     expect(
         d.formatConfigItems,
         equals([
-          UDisksConfigurationItem(
-              'type1', {'key1': DBusString('value1'), 'key2': DBusUint32(42)}),
+          UDisksConfigurationItem('type1', {'key1': DBusString('value1'), 'key2': DBusUint32(42)}),
           UDisksConfigurationItem('type2', {})
         ]));
     expect(d.formatTearDown, isTrue);
@@ -1142,8 +1083,7 @@ void main() {
   test('block device format binary passphrase', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());
@@ -1164,8 +1104,7 @@ void main() {
   test('block device rescan', () async {
     var server = DBusServer();
     addTearDown(() async => await server.close());
-    var clientAddress =
-        await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
+    var clientAddress = await server.listenAddress(DBusAddress.unix(dir: Directory.systemTemp));
 
     var udisks = MockUDisksServer(clientAddress);
     addTearDown(() async => await udisks.close());

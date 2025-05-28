@@ -28,9 +28,7 @@ void main() async {
     );
 
     // Display device information
-    final devicePath = utf8.decode(device.preferredDevice.isNotEmpty
-        ? device.preferredDevice
-        : device.device);
+    final devicePath = utf8.decode(device.preferredDevice.isNotEmpty ? device.preferredDevice : device.device);
     print('Found target device: $devicePath');
     print('  ID Label: ${device.idLabel}');
     print('  ID UUID: ${device.idUUID}');

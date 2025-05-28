@@ -15,42 +15,33 @@ class UDisksDrive {
   UDisksDrive(this._object);
 
   /// Whether the drive can be safely removed / powered off.
-  bool get canPowerOff =>
-      _object.getBooleanProperty(_driveInterfaceName, 'CanPowerOff') ?? false;
+  bool get canPowerOff => _object.getBooleanProperty(_driveInterfaceName, 'CanPowerOff') ?? false;
 
   /// A set of configuration directives that are applied to the drive when it is connected.
   /// Use [setConfiguration] to change these.
   Map<String, DBusValue> get configuration =>
-      _object.getConfigurationProperty(_driveInterfaceName, 'Configuration') ??
-      {};
+      _object.getConfigurationProperty(_driveInterfaceName, 'Configuration') ?? {};
 
   /// The physical connection bus used for the drive as seen by the user.
-  String get connectionBus =>
-      _object.getStringProperty(_driveInterfaceName, 'ConnectionBus') ?? '';
+  String get connectionBus => _object.getStringProperty(_driveInterfaceName, 'ConnectionBus') ?? '';
 
   /// True if media can be ejected from the drive.
   /// Use [eject] to perform this.
-  bool get ejectable =>
-      _object.getBooleanProperty(_driveInterfaceName, 'Ejectable') ?? false;
+  bool get ejectable => _object.getBooleanProperty(_driveInterfaceName, 'Ejectable') ?? false;
 
   ///  A unique and persistent identifier for the device or blank if no such identifier is available.
   String get id => _object.getStringProperty(_driveInterfaceName, 'Id') ?? '';
 
   /// The kind of media currently in the drive or blank if unknown.
-  String get media =>
-      _object.getStringProperty(_driveInterfaceName, 'Media') ?? '';
+  String get media => _object.getStringProperty(_driveInterfaceName, 'Media') ?? '';
 
   /// True if there is media in the drive.
   /// This is always true if [mediaChangeDetected] is false.
-  bool get mediaAvailable =>
-      _object.getBooleanProperty(_driveInterfaceName, 'MediaAvailable') ??
-      false;
+  bool get mediaAvailable => _object.getBooleanProperty(_driveInterfaceName, 'MediaAvailable') ?? false;
 
   /// True if media changes are detected.
   /// The state of the media is reported in [mediaAvailable].
-  bool get mediaChangeDetected =>
-      _object.getBooleanProperty(_driveInterfaceName, 'MediaChangeDetected') ??
-      false;
+  bool get mediaChangeDetected => _object.getBooleanProperty(_driveInterfaceName, 'MediaChangeDetected') ?? false;
 
   /// The physical kind of media the drive uses or the type of the drive or blank if unknown.
   List<String> get mediaCompatibility =>
@@ -61,75 +52,54 @@ class UDisksDrive {
       [];
 
   /// Whether the media can be removed from the drive.
-  bool get mediaRemovable =>
-      _object.getBooleanProperty(_driveInterfaceName, 'MediaRemovable') ??
-      false;
+  bool get mediaRemovable => _object.getBooleanProperty(_driveInterfaceName, 'MediaRemovable') ?? false;
 
   /// A name for the model of the drive or blank if unknown.
-  String get model =>
-      _object.getStringProperty(_driveInterfaceName, 'Model') ?? '';
+  String get model => _object.getStringProperty(_driveInterfaceName, 'Model') ?? '';
 
   /// True if the drive uses an optical disc.
-  bool get optical =>
-      _object.getBooleanProperty(_driveInterfaceName, 'Optical') ?? false;
+  bool get optical => _object.getBooleanProperty(_driveInterfaceName, 'Optical') ?? false;
 
-  bool get opticalBlank =>
-      _object.getBooleanProperty(_driveInterfaceName, 'OpticalBlank') ?? false;
+  bool get opticalBlank => _object.getBooleanProperty(_driveInterfaceName, 'OpticalBlank') ?? false;
 
-  int get opticalNumTracks =>
-      _object.getUint32Property(_driveInterfaceName, 'OpticalNumTracks') ?? 0;
+  int get opticalNumTracks => _object.getUint32Property(_driveInterfaceName, 'OpticalNumTracks') ?? 0;
 
-  int get opticalNumAudioTracks =>
-      _object.getUint32Property(_driveInterfaceName, 'OpticalNumAudioTracks') ??
-      0;
+  int get opticalNumAudioTracks => _object.getUint32Property(_driveInterfaceName, 'OpticalNumAudioTracks') ?? 0;
 
-  int get opticalNumDataTracks =>
-      _object.getUint32Property(_driveInterfaceName, 'OpticalNumDataTracks') ??
-      0;
+  int get opticalNumDataTracks => _object.getUint32Property(_driveInterfaceName, 'OpticalNumDataTracks') ?? 0;
 
-  int get opticalNumSessions =>
-      _object.getUint32Property(_driveInterfaceName, 'OpticalNumSessions') ?? 0;
+  int get opticalNumSessions => _object.getUint32Property(_driveInterfaceName, 'OpticalNumSessions') ?? 0;
 
   /// A hint whether the drive and/or its media is considered removable by the user.
-  bool get removable =>
-      _object.getBooleanProperty(_driveInterfaceName, 'Removable') ?? false;
+  bool get removable => _object.getBooleanProperty(_driveInterfaceName, 'Removable') ?? false;
 
   /// Firmware Revision or blank if unknown.
-  String get revision =>
-      _object.getStringProperty(_driveInterfaceName, 'Revision') ?? '';
+  String get revision => _object.getStringProperty(_driveInterfaceName, 'Revision') ?? '';
 
   /// The rotational rate of the drive in rpm.
   /// Set to -1 for rotating media but rotation rate isn't known and 0 for  non-rotating media.
-  int get rotationRate =>
-      _object.getInt32Property(_driveInterfaceName, 'RotationRate') ?? 0;
+  int get rotationRate => _object.getInt32Property(_driveInterfaceName, 'RotationRate') ?? 0;
 
   ///  The id of the seat the drive is plugged into, if any.
-  String get seat =>
-      _object.getStringProperty(_driveInterfaceName, 'Seat') ?? '';
+  String get seat => _object.getStringProperty(_driveInterfaceName, 'Seat') ?? '';
 
   /// Serial number of the drive or blank if unknown.
-  String get serial =>
-      _object.getStringProperty(_driveInterfaceName, 'Serial') ?? '';
+  String get serial => _object.getStringProperty(_driveInterfaceName, 'Serial') ?? '';
 
   /// An opaque token that, if non-blank, is used to group drives that are part of the same physical device.
-  String get siblingId =>
-      _object.getStringProperty(_driveInterfaceName, 'SiblingId') ?? '';
+  String get siblingId => _object.getStringProperty(_driveInterfaceName, 'SiblingId') ?? '';
 
   /// The size of the drive in bytes.
   int get size => _object.getUint64Property(_driveInterfaceName, 'Size') ?? 0;
 
-  String get sortKey =>
-      _object.getStringProperty(_driveInterfaceName, 'SortKey') ?? '';
+  String get sortKey => _object.getStringProperty(_driveInterfaceName, 'SortKey') ?? '';
 
-  int get timeDetected =>
-      _object.getUint64Property(_driveInterfaceName, 'TimeDetected') ?? 0;
+  int get timeDetected => _object.getUint64Property(_driveInterfaceName, 'TimeDetected') ?? 0;
 
-  int get timeMediaDetected =>
-      _object.getUint64Property(_driveInterfaceName, 'TimeMediaDetected') ?? 0;
+  int get timeMediaDetected => _object.getUint64Property(_driveInterfaceName, 'TimeMediaDetected') ?? 0;
 
   /// A name for the vendor of the drive or blank if unknown.
-  String get vendor =>
-      _object.getStringProperty(_driveInterfaceName, 'Vendor') ?? '';
+  String get vendor => _object.getStringProperty(_driveInterfaceName, 'Vendor') ?? '';
 
   String get wwn => _object.getStringProperty(_driveInterfaceName, 'WWN') ?? '';
 
@@ -218,9 +188,7 @@ class UDisksConfigurationItem {
 
   @override
   bool operator ==(other) {
-    if (other is! UDisksConfigurationItem ||
-        other.type != type ||
-        other.details.length != details.length) {
+    if (other is! UDisksConfigurationItem || other.type != type || other.details.length != details.length) {
       return false;
     }
     for (var key in details.keys) {
@@ -257,10 +225,7 @@ class UDisksBlockDevice {
       return [];
     }
 
-    return (value as DBusArray)
-        .children
-        .map((e) => _parseConfigurationItem(e as DBusStruct))
-        .toList();
+    return (value as DBusArray).children.map((e) => _parseConfigurationItem(e as DBusStruct)).toList();
   }
 
   /// The block device that is backing this encrypted device.
@@ -273,12 +238,10 @@ class UDisksBlockDevice {
   }
 
   /// The special device file for the block device e.g. '/dev/sda2'.
-  List<int> get device =>
-      _object.getByteArrayProperty(_blockInterfaceName, 'Device') ?? [];
+  List<int> get device => _object.getByteArrayProperty(_blockInterfaceName, 'Device') ?? [];
 
   /// The dev_t of the block device.
-  int get deviceNumber =>
-      _object.getUint64Property(_blockInterfaceName, 'DeviceNumber') ?? 0;
+  int get deviceNumber => _object.getUint64Property(_blockInterfaceName, 'DeviceNumber') ?? 0;
 
   /// The drive this block device belongs to.
   UDisksDrive? get drive {
@@ -290,74 +253,57 @@ class UDisksBlockDevice {
   }
 
   /// True if the device should be automatically started.
-  bool get hintAuto =>
-      _object.getBooleanProperty(_blockInterfaceName, 'HintAuto') ?? false;
+  bool get hintAuto => _object.getBooleanProperty(_blockInterfaceName, 'HintAuto') ?? false;
 
   /// If not blank, the icon name to use when presenting the device.
-  String get hintIconName =>
-      _object.getStringProperty(_blockInterfaceName, 'HintIconName') ?? '';
+  String get hintIconName => _object.getStringProperty(_blockInterfaceName, 'HintIconName') ?? '';
 
   /// True if the device should be hidden from users.
-  bool get hintIgnore =>
-      _object.getBooleanProperty(_blockInterfaceName, 'HintIgnore') ?? false;
+  bool get hintIgnore => _object.getBooleanProperty(_blockInterfaceName, 'HintIgnore') ?? false;
 
   /// If not blank, the name to use when presenting the device.
-  String get hintName =>
-      _object.getStringProperty(_blockInterfaceName, 'HintName') ?? '';
+  String get hintName => _object.getStringProperty(_blockInterfaceName, 'HintName') ?? '';
 
   /// True if the device is normally expected to be partitionable.
-  bool get hintPartitionable =>
-      _object.getBooleanProperty(_blockInterfaceName, 'HintPartitionable') ??
-      false;
+  bool get hintPartitionable => _object.getBooleanProperty(_blockInterfaceName, 'HintPartitionable') ?? false;
 
   ///  If not blank, the icon name to use when presenting the device using a symbolic icon.
-  String get hintSymbolicIconName =>
-      _object.getStringProperty(_blockInterfaceName, 'HintSymbolicIconName') ??
-      '';
+  String get hintSymbolicIconName => _object.getStringProperty(_blockInterfaceName, 'HintSymbolicIconName') ?? '';
 
   /// True if this device is considered a *system device*.
-  bool get hintSystem =>
-      _object.getBooleanProperty(_blockInterfaceName, 'HintSystem') ?? false;
+  bool get hintSystem => _object.getBooleanProperty(_blockInterfaceName, 'HintSystem') ?? false;
 
   ///  A unique and persistent identifier for the device or blank if no such identifier is available.
   String get id => _object.getStringProperty(_blockInterfaceName, 'Id') ?? '';
 
   /// The label of the filesystem or other structured data on the block device.
   /// This property is blank if there is no label or the label is unknown.
-  String get idLabel =>
-      _object.getStringProperty(_blockInterfaceName, 'IdLabel') ?? '';
+  String get idLabel => _object.getStringProperty(_blockInterfaceName, 'IdLabel') ?? '';
 
   /// More information about the result of probing the block device.
   /// Its value depends of the value the [idUsage] property.
-  String get idType =>
-      _object.getStringProperty(_blockInterfaceName, 'IdType') ?? '';
+  String get idType => _object.getStringProperty(_blockInterfaceName, 'IdType') ?? '';
 
   /// A result of probing for signatures on the block device.
-  String get idUsage =>
-      _object.getStringProperty(_blockInterfaceName, 'IdUsage') ?? '';
+  String get idUsage => _object.getStringProperty(_blockInterfaceName, 'IdUsage') ?? '';
 
   /// The UUID of the filesystem or other structured data on the block device.
   /// This property is blank if there is no UUID or the UUID is unknown.
-  String get idUUID =>
-      _object.getStringProperty(_blockInterfaceName, 'IdUUID') ?? '';
+  String get idUUID => _object.getStringProperty(_blockInterfaceName, 'IdUUID') ?? '';
 
   /// The version of the filesystem or other structured data on the block device.
   /// This property is blank if there is no version or the version is unknown.
-  String get idVersion =>
-      _object.getStringProperty(_blockInterfaceName, 'IdVersion') ?? '';
+  String get idVersion => _object.getStringProperty(_blockInterfaceName, 'IdVersion') ?? '';
 
   // FIXME: MDRaid
 
   // FIXME: MDRaidMember
 
   /// The special device file to present in the UI instead of the value of the [Device] property.
-  List<int> get preferredDevice =>
-      _object.getByteArrayProperty(_blockInterfaceName, 'PreferredDevice') ??
-      [];
+  List<int> get preferredDevice => _object.getByteArrayProperty(_blockInterfaceName, 'PreferredDevice') ?? [];
 
   /// True if the device cannot be written to.
-  bool get readOnly =>
-      _object.getBooleanProperty(_blockInterfaceName, 'ReadOnly') ?? false;
+  bool get readOnly => _object.getBooleanProperty(_blockInterfaceName, 'ReadOnly') ?? false;
 
   /// The size of the block device in bytes.
   int get size => _object.getUint64Property(_blockInterfaceName, 'Size') ?? 0;
@@ -371,12 +317,8 @@ class UDisksBlockDevice {
     if (value.signature != DBusSignature('aay')) {
       return [];
     }
-    List<int> parseByteArray(DBusArray v) =>
-        v.children.map((e) => (e as DBusByte).value).toList();
-    return (value as DBusArray)
-        .children
-        .map((e) => parseByteArray(e as DBusArray))
-        .toList();
+    List<int> parseByteArray(DBusArray v) => v.children.map((e) => (e as DBusByte).value).toList();
+    return (value as DBusArray).children.map((e) => parseByteArray(e as DBusArray)).toList();
   }
 
   /// List of userspace mount options..
@@ -403,10 +345,8 @@ class UDisksBlockDevice {
   }
 
   UDisksConfigurationItem _parseConfigurationItem(DBusStruct value) {
-    Map<String, DBusValue> parseConfigurationDetails(DBusDict value) =>
-        value.children.map(
-          (key, value) =>
-              MapEntry((key as DBusString).value, (value as DBusVariant).value),
+    Map<String, DBusValue> parseConfigurationDetails(DBusDict value) => value.children.map(
+          (key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value),
         );
     return UDisksConfigurationItem(
       (value.children.elementAt(0) as DBusString).value,
@@ -607,10 +547,7 @@ class UDisksFileSystem {
         .children
         .map(
           (e) => utf8.decode(
-            (e as DBusArray)
-                .children
-                .map((b) => (b as DBusByte).value)
-                .toList(),
+            (e as DBusArray).children.map((b) => (b as DBusByte).value).toList(),
           ),
         )
         .toList();
@@ -619,8 +556,7 @@ class UDisksFileSystem {
   /// The size of the filesystem in bytes.
   /// Returns 0 if the size is unknown.
   /// Note: Reading this property typically causes I/O.
-  int get size =>
-      _object.getUint64Property(_filesystemInterfaceName, 'Size') ?? 0;
+  int get size => _object.getUint64Property(_filesystemInterfaceName, 'Size') ?? 0;
 
   /// Sets the filesystem label.
   Future<void> setLabel(String label) async {
@@ -781,8 +717,7 @@ class _UDisksManager {
       [];
 
   /// The version of the daemon.
-  String get version =>
-      object.getStringProperty(_managerInterfaceName, 'Version') ?? '';
+  String get version => object.getStringProperty(_managerInterfaceName, 'Version') ?? '';
 
   _UDisksManager(this.object);
 
@@ -799,11 +734,9 @@ class _UDisksManager {
 
 class _UDisksInterface {
   final Map<String, DBusValue> properties;
-  final propertiesChangedStreamController =
-      StreamController<List<String>>.broadcast();
+  final propertiesChangedStreamController = StreamController<List<String>>.broadcast();
 
-  Stream<List<String>> get propertiesChangedStream =>
-      propertiesChangedStreamController.stream;
+  Stream<List<String>> get propertiesChangedStream => propertiesChangedStreamController.stream;
 
   _UDisksInterface(this.properties);
 
@@ -868,10 +801,7 @@ class _UDisksObject extends DBusRemoteObject {
     if (value.signature != DBusSignature('ay')) {
       return null;
     }
-    return (value as DBusArray)
-        .children
-        .map((e) => (e as DBusByte).value)
-        .toList();
+    return (value as DBusArray).children.map((e) => (e as DBusByte).value).toList();
   }
 
   /// Gets a cached boolean property, or returns null if not present or not the correct type.
@@ -943,10 +873,7 @@ class _UDisksObject extends DBusRemoteObject {
     if (value.signature != DBusSignature('as')) {
       return null;
     }
-    return (value as DBusArray)
-        .children
-        .map((e) => (e as DBusString).value)
-        .toList();
+    return (value as DBusArray).children.map((e) => (e as DBusString).value).toList();
   }
 
   /// Gets a cached object path property, or returns null if not present or not the correct type.
@@ -974,8 +901,7 @@ class _UDisksObject extends DBusRemoteObject {
       return null;
     }
     return (value as DBusDict).children.map(
-          (key, value) =>
-              MapEntry((key as DBusString).value, (value as DBusVariant).value),
+          (key, value) => MapEntry((key as DBusString).value, (value as DBusVariant).value),
         );
   }
 
@@ -1001,24 +927,18 @@ class UDisksClient {
   Stream<UDisksDrive> get driveRemoved => _driveRemovedStreamController.stream;
 
   /// Stream of block devices as they are added.
-  Stream<UDisksBlockDevice> get blockDeviceAdded =>
-      _blockDeviceAddedStreamController.stream;
+  Stream<UDisksBlockDevice> get blockDeviceAdded => _blockDeviceAddedStreamController.stream;
 
   /// Stream of block devices as they are removed.
-  Stream<UDisksBlockDevice> get blockDeviceRemoved =>
-      _blockDeviceRemovedStreamController.stream;
+  Stream<UDisksBlockDevice> get blockDeviceRemoved => _blockDeviceRemovedStreamController.stream;
 
   final _driveAddedStreamController = StreamController<UDisksDrive>.broadcast();
-  final _driveRemovedStreamController =
-      StreamController<UDisksDrive>.broadcast();
-  final _blockDeviceAddedStreamController =
-      StreamController<UDisksBlockDevice>.broadcast();
-  final _blockDeviceRemovedStreamController =
-      StreamController<UDisksBlockDevice>.broadcast();
+  final _driveRemovedStreamController = StreamController<UDisksDrive>.broadcast();
+  final _blockDeviceAddedStreamController = StreamController<UDisksBlockDevice>.broadcast();
+  final _blockDeviceRemovedStreamController = StreamController<UDisksBlockDevice>.broadcast();
 
   /// Supported encryption types.
-  List<String> get supportedEncryptionTypes =>
-      _manager?.supportedEncryptionTypes ?? [];
+  List<String> get supportedEncryptionTypes => _manager?.supportedEncryptionTypes ?? [];
 
   /// Supported filesystems.
   List<String> get supportedFilesystems => _manager?.supportedFilesystems ?? [];
@@ -1123,8 +1043,7 @@ class UDisksClient {
       );
     });
 
-    var managerObject =
-        _objects[DBusObjectPath('/org/freedesktop/UDisks2/Manager')];
+    var managerObject = _objects[DBusObjectPath('/org/freedesktop/UDisks2/Manager')];
     if (managerObject != null) {
       _manager = _UDisksManager(managerObject);
     }
@@ -1147,8 +1066,7 @@ class UDisksClient {
     return object != null ? UDisksDrive(object) : null;
   }
 
-  bool _isDrive(_UDisksObject object) =>
-      object.interfaces.containsKey('org.freedesktop.UDisks2.Drive');
+  bool _isDrive(_UDisksObject object) => object.interfaces.containsKey('org.freedesktop.UDisks2.Drive');
 
   /// The block devices present on this system.
   /// Use [blockDeviceAdded] and [blockDeviceRemoved] to detect when this list changes.
@@ -1167,8 +1085,7 @@ class UDisksClient {
     return object != null ? UDisksBlockDevice(this, object) : null;
   }
 
-  bool _isBlockDevice(_UDisksObject object) =>
-      object.interfaces.containsKey('org.freedesktop.UDisks2.Block');
+  bool _isBlockDevice(_UDisksObject object) => object.interfaces.containsKey('org.freedesktop.UDisks2.Block');
 
   /// Terminates all active connections. If a client remains unclosed, the Dart process may not terminate.
   Future<void> close() async {
