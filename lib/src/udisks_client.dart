@@ -615,8 +615,11 @@ class UDisksFileSystem {
   ///
   /// Options:
   /// - `force` (bool): Force unmount even if busy.
-  Future<void> unmount({bool force = false}) async {
+  Future<void> unmount({bool force = false, bool authNoUserInteraction = false}) async {
     var options = <String, DBusValue>{};
+    if (authNoUserInteraction) {
+      options['auth.no_user_interaction'] = DBusBoolean(true);
+    }
     if (force) {
       options['force'] = DBusBoolean(true);
     }
