@@ -213,6 +213,12 @@ class UDisksBlockDevice {
 
   UDisksBlockDevice(this._client, this._object);
 
+  /// The D-Bus object path, unchanged when the filesystem UUID changes.
+  DBusObjectPath get objectPath => _object.path;
+
+  /// Whether this block device is a partition rather than a whole drive.
+  bool get isPartition => _object.interfaces.containsKey('org.freedesktop.UDisks2.Partition');
+
   /// The configuration for the device.
   /// Use the [addConfigurationItem], [removeConfigurationItem] and [updateConfigurationItem] methods to add, remove and update configuration items.
   /// Use [getSecretConfiguration] to get the secrets (e.g. passphrases) that may be part of the configuration but isn't exported in this property for security reasons.
@@ -423,8 +429,12 @@ class UDisksBlockDevice {
     bool noDiscard = false,
     Iterable<UDisksConfigurationItem> configItems = const [],
     bool tearDown = false,
+    bool authNoUserInteraction = false,
   }) async {
     var options = <String, DBusValue>{};
+    if (authNoUserInteraction) {
+      options['auth.no_user_interaction'] = DBusBoolean(true);
+    }
     if (takeOwnership) {
       options['take-ownership'] = DBusBoolean(true);
     }
@@ -945,6 +955,19 @@ class UDisksClient {
 
   /// Default encryption type.
   String get defaultEncryptionType => _manager?.defaultEncryptionType ?? '';
+
+  /// Whether the tools required to create [type] are installed.
+  Future<bool> canFormat(String type) async {
+    final manager = _manager;
+    if (manager == null) return false;
+    final result = await manager.object.callMethod(
+      'org.freedesktop.UDisks2.Manager',
+      'CanFormat',
+      [DBusString(type)],
+      replySignature: DBusSignature('(bs)'),
+    );
+    return ((result.returnValues.single as DBusStruct).children.first as DBusBoolean).value;
+  }
 
   /// The version of the UDisks daemon.
   String get version => _manager?.version ?? '';
